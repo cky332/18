@@ -1,7 +1,7 @@
 .PHONY: setup install install-dev env check clean docker-build docker-up docker-down help
 
-PYTHON ?= python3
-VENV_DIR ?= .venv
+PYTHON ?= python
+CONDA_ENV ?= graphrag-delete
 CACHE_DIR ?= cache
 
 # ============================================================
@@ -16,20 +16,22 @@ help:  ## 显示所有可用命令
 	@echo ""
 
 # ============================================================
-# 环境配置
+# 环境配置（Anaconda）
 # ============================================================
-setup: $(VENV_DIR)/bin/activate env  ## 一键完整环境配置（虚拟环境 + 依赖 + .env）
+setup: conda-create env  ## 一键环境配置（conda 环境 + 依赖 + .env）
+	@echo ""
 	@echo "[OK] 环境配置完成！"
-	@echo "     激活虚拟环境: source $(VENV_DIR)/bin/activate"
+	@echo "     激活环境: conda activate $(CONDA_ENV)"
 	@echo "     编辑 API 配置: vi .env"
 
-$(VENV_DIR)/bin/activate:
-	$(PYTHON) -m venv $(VENV_DIR)
-	$(VENV_DIR)/bin/pip install --upgrade pip
-	$(VENV_DIR)/bin/pip install -r requirements.txt
-	@touch $(VENV_DIR)/bin/activate
+conda-create:  ## 创建 conda 环境并安装所有依赖
+	conda env create -f environment.yml || conda env update -f environment.yml
+	@echo "[OK] conda 环境 '$(CONDA_ENV)' 已就绪"
 
-install:  ## 安装生产依赖
+conda-update:  ## 更新 conda 环境（依赖变更后执行）
+	conda env update -f environment.yml --prune
+
+install:  ## 在当前环境中用 pip 安装依赖（不创建 conda 环境）
 	pip install -r requirements.txt
 
 install-dev: install  ## 安装生产 + 开发依赖
@@ -49,7 +51,7 @@ env:  ## 从 .env.example 创建 .env 文件（如不存在）
 check:  ## 检查运行环境是否就绪
 	@echo "=== 环境检查 ==="
 	@echo -n "Python 版本: " && $(PYTHON) --version
-	@echo -n "pip 版本:    " && pip --version 2>/dev/null || echo "未找到"
+	@echo -n "conda 环境:  " && (conda info --envs 2>/dev/null | grep '\*' || echo "未检测到 conda")
 	@echo ""
 	@echo "--- 核心依赖 ---"
 	@$(PYTHON) -c "import openai; print(f'openai:       {openai.__version__}')" 2>/dev/null || echo "openai:       [未安装]"
@@ -122,7 +124,7 @@ clean:  ## 清理临时文件和 Python 缓存
 	rm -f kv_store_community_reports3.json
 	@echo "[OK] 临时文件已清理"
 
-clean-all: clean  ## 清理所有（含虚拟环境和备份）
-	rm -rf $(VENV_DIR)
+clean-all: clean  ## 清理所有（含 conda 环境和备份）
+	conda env remove -n $(CONDA_ENV) -y 2>/dev/null || true
 	rm -rf $(CACHE_DIR)/.deletion_backups
 	@echo "[OK] 全部清理完成"
