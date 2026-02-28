@@ -7,6 +7,7 @@ import xml.etree.ElementTree as ET
 
 from delete_utils import (
     get_logger,
+    load_api_config,
     validate_entity_exists,
     create_backup,
     restore_backup,
@@ -15,6 +16,9 @@ from delete_utils import (
     DeletionError,
     EntityNotFoundError,
 )
+
+# 尽早加载 .env 中的 API 配置，确保后续所有模块都能读到环境变量
+load_api_config()
 from delete_vdb_entities import delete_vdb_entities
 from before_search import extract_entities
 from delete_update_description import update_graphml_descriptions
