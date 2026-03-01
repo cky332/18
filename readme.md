@@ -8,25 +8,12 @@
 pip install -e .
 ```
 
-在 `.env` 文件中配置 API：
-
-```
-OPENAI_API_KEY=sk-xxx
-OPENAI_BASE_URL=https://api.zhizengzeng.com/v1/
-```
-
 ## 使用方法
 
 ### 删除实体
 
 ```shell
 python "delete all.py" <实体名>
-```
-
-示例：
-
-```shell
-python "delete all.py" Benjamin
 ```
 
 删除流程：
@@ -39,32 +26,6 @@ python "delete all.py" Benjamin
 
 删除前会自动备份到 `cache/.deletion_backups/`。
 
-### 验证删除效果
-
-**离线验证（不需要 API）：**
-
-```shell
-python find_graphml_description_number.py
-python find_entity_graphml.py
-```
-
-**评估脚本（需要 API）：**
-
-| 脚本 | 说明 |
-|------|------|
-| `evaluate_Dumbledore_no_attack.py` | 无攻击基线 |
-| `evaluate_dumblore_Multiple Choice.py` | 多选题评估 |
-| `evaluate_Dumbledore_Affirmative Suffix.py` | 肯定后缀攻击 |
-| `evaluate_Dumbledore_Background Hint.py` | 背景提示攻击 |
-| `evaluate_Dumbledore_In-context Learning.py` | 上下文学习攻击 |
-| `evaluate_Dumbledore_Prefix Injection.py` | 前缀注入攻击 |
-| `evaluate_Dumbledore_Reverse Query.py` | 反向查询攻击 |
-| `evaluate_Dumbledore_Role Playing.py` | 角色扮演攻击 |
-| `evaluate_Dumbledore_Synonym Manipulation.py` | 同义词替换攻击 |
-| `evaluate_Dumbledore_neighbor.py` | 邻居实体评估 |
-| `evaluate_Dumbledore_unrelated.py` | 无关实体评估 |
-
-评估指标：ROUGE-1/2/L（越低说明删除越彻底）和多选准确率。
 
 ## 项目结构
 
